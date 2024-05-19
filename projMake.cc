@@ -35,12 +35,12 @@ void Project(const std::string& fileName) {
 
 int main() {
     std::string name;
-    std::cout << "Enter project name : ";
+    std::cout << "Enter project name: ";
     std::cin >> name;
 
     Project(name);
 
-    std::cout << "Files " << name << ".cc and " << name << ".hh created successfully." << std::endl;
+    std::cout << "Project '" << name << "' was successfully made" << std::endl;
 
     return 0;
 }
