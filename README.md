@@ -1,2 +1,2 @@
 # ProjectMaker
-Generates project with chosen name
+Generates project with chosen name and chosen langauge
