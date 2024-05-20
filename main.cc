@@ -86,7 +86,7 @@ void Project(const std::string& fileName, const std::string& fileLang) {
             std::cerr << "Failed to open " << MPath << std::endl;
             return;
         }
-        newM << "def main():\n\tprint(\"Hello, World!\")";
+        newM << "def "+ fileName +"():\n\tprint(\"Hello, World!\")";
         newM.close();
     } else if(fileLang == "Pascal" || fileLang == "Pas") {
         MPath = dir + "/" + fileName + ".pas";
@@ -98,15 +98,56 @@ void Project(const std::string& fileName, const std::string& fileLang) {
         }
         newM << "program "+ fileLang +";\n\nbegin\n\tWriteLn('Hello, World!');\nend.";
         newM.close();
+    } else if(fileLang == "Lua") {
+        MPath = dir + "/" + fileName + ".lua";
+
+        std::ofstream newM(MPath);
+        if (!newM.is_open()) {
+            std::cerr << "Failed to open " << MPath << std::endl;
+            return;
+        }
+        newM << "local function "+ fileName +"()\n\tprint(\"Hello, World!\")\nend\n\nmain()";
+        newM.close();
+    } else if(fileLang == "Javascript" || fileLang == "JavaScript") {
+        MPath = dir + "/" + fileName + ".js";
+
+        std::ofstream newM(MPath);
+        if (!newM.is_open()) {
+            std::cerr << "Failed to open " << MPath << std::endl;
+            return;
+        }
+        newM << "function "+ fileName +"() {\n\tconsole.log('Hello, World!');\n}\n\n"+ fileName +"();";
+        newM.close();
+    } else if(fileLang == "Java") {
+        MPath = dir + "/" + fileName + ".java";
+
+        std::ofstream newM(MPath);
+        if (!newM.is_open()) {
+            std::cerr << "Failed to open " << MPath << std::endl;
+            return;
+        }
+        newM << "public class "+ fileName +" {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World!\");\n\t}\n}";
+        newM.close();
+    } else if(fileLang == "C#" || fileLang == "Cs") {
+        MPath = dir + "/" + fileName + ".cs";
+
+        std::ofstream newM(MPath);
+        if (!newM.is_open()) {
+            std::cerr << "Failed to open " << MPath << std::endl;
+            return;
+        }
+        newM << "using System;\n\nnamespace "+ fileName +" {\n\tclass Program {\n\t\tstatic void Main(string[] args) {\n\t\t\tConsole.WriteLine(\"Hello, World!\");\n\t\t}\n\t}\n}";
+        newM.close();
     }
 }
 
 int main() {
     std::string name;
+    std::string lang;
+
     std::cout << "Enter projects name: ";
     std::cin >> name;
 
-    std::string lang;
     std::cout << "Enter projects language (Capital Letter): ";
     std::cin >> lang;
 
