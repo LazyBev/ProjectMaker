@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	g++ -o a *.cc
+	g++ -o boil *.cc
