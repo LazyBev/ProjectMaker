@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <fstream>
 #include <filesystem>
 
@@ -20,7 +21,10 @@ Result writeToFile(const std::string& path, const std::string& contents) {
 Result project(const std::string& projectName, const std::string& projectLanguage) {
     std::string dir = projectName;
 
-    std::filesystem::create_directory(dir);
+    if (!std::filesystem::create_directory(dir)) {
+        std::cerr << "Failed to create directory " << dir << std::endl;
+        return Err;
+    }
 
     if(projectLanguage == "C++" || projectLanguage == "Cpp") {
         std::string mainPath = dir + "/" + projectName + ".cc";
@@ -123,8 +127,8 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     } else if(projectLanguage == "Zig") {
         std::string mainPath = dir + "/" + projectName + ".zig";
         if (writeToFile(mainPath,
-            "const std = @import("std");\n\n"
-            "pub fn main() void {\n"
+            "const std = @import(\"std\");\n\n"
+            "pub fn main() !void {\n"
             "\tconst stdout = std.io.getStdOut().writer();\n"
             "\ttry stdout.print(\"Hello, world!\");\n"
             "}"
@@ -140,7 +144,7 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     } else if(projectLanguage == "Kotlin" || projectLanguage == "Kot") {
         std::string mainPath = dir + "/" + projectName + ".kt";
         if (writeToFile(mainPath,
-            "fun main{\n"
+            "fun main() {\n"
             "\tprintln(\"Hello, world!\")\n"
             "}"
         ) == Err) return Err;
@@ -151,10 +155,14 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     return Ok;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     std::string name;
-    std::cout << "Enter projects name: ";
-    std::cin >> name;
+
+    if (argc >= 2 && strcmp(argv[1], "-d") == 0)
+        name = "main";
+    else {
+        std::cin >> name;
+    }
 
     std::string lang;
     std::cout << "Enter projects language (Capital Letter): ";
@@ -163,6 +171,5 @@ int main() {
     if (project(name, lang) != Ok) return 1;
 
     std::cout << "Project '" << name << "' ("+ lang +") was successfully made" << std::endl;
-
     return 0;
 }
