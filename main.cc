@@ -36,7 +36,7 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string makePath = dir + "/" + "Makefile";
         if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tg++ -o a *cc") == Err) return Err;
         if (writeToFile(mainPath,
-            "#include <iostream>\n\n"
+            "#include <iostream>\n"
             "#include \"" + projectName + ".hh\"\n\n"
             "int main() {\n"
             "\tstd::cout << \"Hello, World!\" << std::endl;\n\n"
@@ -59,8 +59,8 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string makePath = dir + "/" + "Makefile";
         if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tgcc -o a *c") == Err) return Err;
         if (writeToFile(mainPath,
-            "#include <stdio.h>\n\n"
-            "#include \"" + projectName + ".h\""
+            "#include <stdio.h>\n"
+            "#include \"" + projectName + ".h\"\n\n"
             "int main() {\n"
             "\tprintf(\"Hello, World!\");\n\n"
             "\treturn 0;\n"
