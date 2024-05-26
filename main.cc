@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fstream>
 #include <filesystem>
+#include <vector>
 
 enum Result {
     Ok,
@@ -9,7 +10,7 @@ enum Result {
 };
 
 int varCount;
-std::string vars[varCount];
+std::vector<std::string> vars;
 std::string lang;
 std::string name;
 
@@ -24,7 +25,7 @@ Result writeToFile(const std::string& path, const std::string& contents) {
     return Ok;
 }
 
-Result project(const std::string& projectName, const std::string& projectLanguage, const std::string& var, int& vCount) {
+Result project(const std::string& projectName, const std::string& projectLanguage, std::vector<std::string>& var) {
     std::string dir = projectName;
 
     if (!std::filesystem::create_directory(dir)) {
@@ -43,10 +44,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream << "int " << var[i] << " = " << vCount << "\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "int " << *it << " = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath, 
@@ -54,7 +55,7 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "\tstd::cout << \"Hello, World!\" << std::endl;\n\n"
             "\treturn 0;\n"
             "}"
-        ) == Err)
+        ) == Err) return Err;
 
         std::string upperName = projectName;
         for (char &c : upperName) {
@@ -77,10 +78,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream << "int " << var[i] << " = " << vCount << "\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "int " << *it << " = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -100,12 +101,11 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Python" || projectLanguage == "Py") {
         std::string mainPath = dir + "/" + projectName + ".py";
-
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream << var[i] << " = " << vCount << "\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << *it << ":int = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -119,10 +119,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream "\t" << var[i] << ": integer;\n" ;
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "\t" << *it << ": integer \n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -134,10 +134,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string mainPath = dir + "/" + projectName + ".lua";
         
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream << "local " << var[i] << " = " << vCount << "\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "local " << *it << " = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -150,10 +150,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string mainPath = dir + "/" + projectName + ".js";
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream "let "<< var[i] << " = " << vCount << ";\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "let " << *it << " = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -187,10 +187,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string mainPath = dir + "/" + projectName + ".rs";
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream "let " << var[i] << ": i32" << " = " << vCount << ";\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "let " << *it << ": i32 = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -205,10 +205,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
 
         std::ofstream stream(mainPath);
-        for(int i == 0; i < vCount; i++;) {
-            stream "var " << var[i] << ": i32" << " = " << vCount << ";\n";
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "var " << *it << ": i32 = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -220,10 +220,11 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     } else if(projectLanguage == "Nim") {
         std::string mainPath = dir + "/" + projectName + ".nim";
 
-        for(int i == 0; i < vCount; i++;) {
-            stream "var " << var[i] << ": int" << " = " << vCount << "\n";
+        std::ofstream stream(mainPath);
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "var " << *it << ": int = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -235,10 +236,11 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     } else if(projectLanguage == "Kotlin" || projectLanguage == "Kot") {
         std::string mainPath = dir + "/" + projectName + ".kt";
 
-        for(int i == 0; i < vCount; i++;) {
-            stream "var " << var[i] << ": Int" << " = " << vCount << "\n";
+        std::ofstream stream(mainPath);
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << "var " << *it << ": Int = " << var.size() << "\n";
         }
-        stream << "\n"
+        stream << "\n";
         stream.close();
 
         if (writeToFile(mainPath,
@@ -249,15 +251,19 @@ Result project(const std::string& projectName, const std::string& projectLanguag
     }  else if(projectLanguage == "Haskell" || projectLanguage == "Hask") {
         std::string mainPath = dir + "/" + projectName + ".hs";
 
-        for(int i == 0; i < vCount; i++;) {
-            stream var[i] << " :: Int\n" << var[i] << " = " << vCount << "\n\n";
-        }
-        stream.close();
-
         if (writeToFile(mainPath,
             "module Start\n"
             "\t( main\n"
             "\t) where\n\n"
+        ) == Err) return Err;
+
+        std::ofstream stream(mainPath);
+        for (auto it = var.begin(); it != var.end(); ++it) {
+            stream << *it << ":: Int\n " << *it << " = " << var.size() << "\n\n";
+        }
+        stream.close();
+
+        if (writeToFile(mainPath,
             "main :: IO ()\n"
             "main = putStrLn \"Hello, World\""
         ) == Err) return Err;
@@ -269,31 +275,32 @@ Result project(const std::string& projectName, const std::string& projectLanguag
 }
 
 int main(int argc, char* argv[]) {
-    if(argc >= 2 && strcmp(argv[1], "-d") == 0 || argc >= 2 && strcmp(argv[2], "-d") == 0) {
-        name = "main";
-    } else {
-        std::cout << "Enter projects name: "
+    if(argc >= 2 && strcmp(argv[1], "-n") == 0 || argc >= 2 && strcmp(argv[2], "-n") == 0) {
+        std::cout << "Enter projects name: ";
         std::cin >> name;
+    } else {
+        name = "main";
     }
 
     std::cout << "Enter projects language (Capital Letter): ";
     std::cin >> lang;
 
-    if (argc >= 2 && strcmp(argv[1], "-v") != 0 || argc >= 2 && strcmp(argv[2], "-v") != 0) {
+    if (argc >= 2 && strcmp(argv[1], "-v") == 0 || argc >= 2 && strcmp(argv[2], "-v") == 0) {
+        std::string in;
         std::cout << "How many vars: ";
         std::cin >> varCount;
-        for(int i = 0; i < varCount; i++;) {
+        for(int i = 0; i < varCount; i++) {
             std::cout << "var" << varCount << ": ";
-            std::cin >> vars;
+            std::cin >> in;
+            vars.push_back(in);
         }
     } else {
-        varCount = 1;
-        vars[varCount] = "num"
+        vars.push_back("num");
     }
 
     system("clear");    
-    if (project(name, lang, vars, varCount) != Ok) return 1;
+    if (project(name, lang, vars) != Ok) return 1;
 
-    std::cout << "Project '" << name << "' ("+ lang +") was successfully made" << std::endl;
+    std::cout << "Project '" << name << "' (" << lang << ") was successfully made" << std::endl;
     return 0;
 }
