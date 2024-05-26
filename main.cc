@@ -8,8 +8,6 @@ enum Result {
     Err,
 };
 
-int varCount;
-std::vector<std::string> vars;
 std::string lang;
 std::string name;
 
@@ -24,7 +22,7 @@ Result writeToFile(const std::string& path, const std::string& contents) {
     return Ok;
 }
 
-Result project(const std::string& projectName, const std::string& projectLanguage, std::vector<std::string>& var) {
+Result project(const std::string& projectName, const std::string& projectLanguage) {
     std::string dir = projectName;
 
     if (!std::filesystem::create_directory(dir)) {
