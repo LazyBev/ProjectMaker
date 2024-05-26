@@ -2,7 +2,6 @@
 #include <cstring>
 #include <fstream>
 #include <filesystem>
-#include <vector>
 
 enum Result {
     Ok,
@@ -41,16 +40,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         if (writeToFile(mainPath,
             "#include <iostream>\n\n"
             "#include \"" + projectName + ".hh\"\n\n"
-        ) == Err) return Err;
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "int " << *it << " = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
-        if (writeToFile(mainPath, 
             "int main() {\n"
             "\tstd::cout << \"Hello, World!\" << std::endl;\n\n"
             "\treturn 0;\n"
@@ -75,16 +64,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "#include <stdio.h>\n\n"
             "#include \"" + projectName + ".h\""
             "int main() {\n"
-        ) == Err) return Err;
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "int " << *it << " = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
-        if (writeToFile(mainPath,
             "\tprintf(\"Hello, World!\");\n\n"
             "\treturn 0;\n"
             "}"
@@ -101,13 +80,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Python" || projectLanguage == "Py") {
         std::string mainPath = dir + "/" + projectName + ".py";
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << *it << ":int = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "def main():\n\tprint(\"Hello, World!\")"
         ) == Err) return Err;
@@ -115,31 +87,12 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string mainPath = dir + "/" + projectName + ".pas";
         if (writeToFile(mainPath,
             "program main;\n\n"
-            "var"
-        ) == Err) return Err;
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "\t" << *it << ": integer \n";
-        }
-        stream << "\n";
-        stream.close();
-
-        if (writeToFile(mainPath,
             "begin\n"
             "\tWriteLn('Hello, World!');\n"
             "end."
         ) == Err) return Err;
     } else if(projectLanguage == "Lua") {
         std::string mainPath = dir + "/" + projectName + ".lua";
-        
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "local " << *it << " = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "local function main()\n"
             "\tprint(\"Hello, World!\")\n"
@@ -148,14 +101,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Javascript" || projectLanguage == "JavaScript") {
         std::string mainPath = dir + "/" + projectName + ".js";
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "let " << *it << " = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "function main() {\n"
             "\tconsole.log('Hello, World!');\n"
@@ -185,14 +130,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Rust" || projectLanguage == "Rs") {
         std::string mainPath = dir + "/" + projectName + ".rs";
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "let " << *it << ": i32 = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "pub fn main() {\n"
             "\tprintln!(\"Hello, World!\");\n"
@@ -202,16 +139,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         std::string mainPath = dir + "/" + projectName + ".zig";
         if (writeToFile(mainPath,
             "const std = @import(\"std\");\n\n"
-        ) == Err) return Err;
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "var " << *it << ": i32 = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
-        if (writeToFile(mainPath,
             "pub fn main() !void {\n"
             "\tconst stdout = std.io.getStdOut().writer();\n"
             "\ttry stdout.print(\"Hello, world!\");\n"
@@ -219,14 +146,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Nim") {
         std::string mainPath = dir + "/" + projectName + ".nim";
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "var " << *it << ": int = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "proc main() =\n"
             "\techo \"Hello, world!\"\n\n"
@@ -235,14 +154,6 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     } else if(projectLanguage == "Kotlin" || projectLanguage == "Kot") {
         std::string mainPath = dir + "/" + projectName + ".kt";
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << "var " << *it << ": Int = " << var.size() << "\n";
-        }
-        stream << "\n";
-        stream.close();
-
         if (writeToFile(mainPath,
             "fun main() {\n"
             "\tprintln(\"Hello, world!\")\n"
@@ -250,20 +161,10 @@ Result project(const std::string& projectName, const std::string& projectLanguag
         ) == Err) return Err;
     }  else if(projectLanguage == "Haskell" || projectLanguage == "Hask") {
         std::string mainPath = dir + "/" + projectName + ".hs";
-
         if (writeToFile(mainPath,
             "module Start\n"
             "\t( main\n"
             "\t) where\n\n"
-        ) == Err) return Err;
-
-        std::ofstream stream(mainPath);
-        for (auto it = var.begin(); it != var.end(); ++it) {
-            stream << *it << ":: Int\n " << *it << " = " << var.size() << "\n\n";
-        }
-        stream.close();
-
-        if (writeToFile(mainPath,
             "main :: IO ()\n"
             "main = putStrLn \"Hello, World\""
         ) == Err) return Err;
@@ -275,7 +176,7 @@ Result project(const std::string& projectName, const std::string& projectLanguag
 }
 
 int main(int argc, char* argv[]) {
-    if(argc >= 2 && strcmp(argv[1], "-n") == 0 || argc >= 2 && strcmp(argv[2], "-n") == 0) {
+    if(argc >= 1 && strcmp(argv[1], "-n") == 0) {
         std::cout << "Enter projects name: ";
         std::cin >> name;
     } else {
@@ -285,21 +186,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Enter projects language (Capital Letter): ";
     std::cin >> lang;
 
-    if (argc >= 2 && strcmp(argv[1], "-v") == 0 || argc >= 2 && strcmp(argv[2], "-v") == 0) {
-        std::string in;
-        std::cout << "How many vars: ";
-        std::cin >> varCount;
-        for(int i = 0; i < varCount; i++) {
-            std::cout << "var" << varCount << ": ";
-            std::cin >> in;
-            vars.push_back(in);
-        }
-    } else {
-        vars.push_back("num");
-    }
-
     system("clear");    
-    if (project(name, lang, vars) != Ok) return 1;
+    if (project(name, lang) != Ok) return 1;
 
     std::cout << "Project '" << name << "' (" << lang << ") was successfully made" << std::endl;
     return 0;
