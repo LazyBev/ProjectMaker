@@ -62,7 +62,7 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "#include <stdio.h>\n"
             "#include \"" + projectName + ".h\"\n\n"
             "int main() {\n"
-            "\tprintf(\"Hello, World!\");\n\n"
+            "\tprintf(\"Hello, World" + "\\" + "n" + "\");\n\n"
             "\treturn 0;\n"
             "}"
         ) == Err) return Err;
