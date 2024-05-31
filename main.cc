@@ -1,124 +1,148 @@
-#include <iostream>
-#include <cstring>
-#include <fstream>
-#include <filesystem>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <ctype.h>
 
-enum Result {
+// Define enum for Result
+typedef enum {
     Ok,
     Err,
-};
+} Result;
 
-std::string lang;
-std::string name;
+// Function prototypes
+Result writeToFile(const char *path, const char *contents);
+Result project(const char *projectName, const char *projectLanguage);
+void toUpperCase(char *str);
 
-Result writeToFile(const std::string& path, const std::string& contents) {
-    std::ofstream stream(path);
-    if (!stream.is_open()) {
-        std::cerr << "Failed to open " << path << std::endl;
+int main(int argc, char* argv[]) {
+    char name[100];
+    char lang[100];
+
+    if (argc >= 2 && strcmp(argv[1], "-n") == 0) {
+        printf("Enter project's name: ");
+        scanf("%99s", name);
+    } else {
+        strcpy(name, "main");
+    }
+
+    printf("Enter project's language (Capital Letter): ");
+    scanf("%99s", lang);
+
+    system("clear");
+
+    if (project(name, lang) != Ok) return 1;
+
+    printf("Project '%s' (%s) was successfully made\n", name, lang);
+    return 0;
+}
+
+Result writeToFile(const char *path, const char *contents) {
+    FILE *file = fopen(path, "w");
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open %s\n", path);
         return Err;
     }
-    stream << contents;
-    stream.close();
+    fprintf(file, "%s\n", contents);
+    fclose(file);
     return Ok;
 }
 
-Result project(const std::string& projectName, const std::string& projectLanguage) {
-    std::string dir = projectName;
+void toUpperCase(char *str) {
+    for (; *str; ++str) {
+        *str = toupper((unsigned char) *str);
+    }
+}
 
-    if (!std::filesystem::create_directory(dir)) {
-        std::cerr << "Failed to create directory " << dir << std::endl;
+Result project(const char *projectName, const char *projectLanguage) {
+    // Create directory
+    if (mkdir(projectName, 0755) == -1) {
+        perror("Failed to create directory");
         return Err;
     }
 
-    if(projectLanguage == "C++" || projectLanguage == "Cpp") {
-        std::string mainPath = dir + "/" + projectName + ".cc";
-        std::string headerPath = dir + "/" + projectName + ".hh";
-        std::string makePath = dir + "/" + "Makefile";
-        if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tg++ -o a *cc") == Err) return Err;
+    char mainPath[256], headerPath[256], makePath[256];
+    snprintf(mainPath, sizeof(mainPath), "%s/%s", projectName, projectName);
+    snprintf(headerPath, sizeof(headerPath), "%s/%s.h", projectName, projectName);
+    snprintf(makePath, sizeof(makePath), "%s/Makefile", projectName);
+
+    if (strcmp(projectLanguage, "C++") == 0 || strcmp(projectLanguage, "Cpp") == 0) {
+        strcat(mainPath, ".cc");
+        snprintf(headerPath, sizeof(headerPath), "%s/%s.hh", projectName, projectName);
+        if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tg++ -o a *.cc") == Err) return Err;
         if (writeToFile(mainPath,
             "#include <iostream>\n"
-            "#include \"" + projectName + ".hh\"\n\n"
+            "#include \"" projectName ".hh\"\n\n"
             "int main() {\n"
             "\tstd::cout << \"Hello, World!\" << std::endl;\n\n"
             "\treturn 0;\n"
             "}"
         ) == Err) return Err;
-
-        std::string upperName = projectName;
-        for (char &c : upperName) {
-            c = std::toupper(static_cast<unsigned char>(c));
-        }
+        toUpperCase(headerPath);
         if (writeToFile(headerPath,
-            "#ifndef " + upperName + "_HH\n"
-            "#define " + upperName + "_HH\n\n"
+            "#ifndef " headerPath "_HH\n"
+            "#define " headerPath "_HH\n\n"
             "#endif"
         ) == Err) return Err;
-    } else if(projectLanguage == "C") {
-        std::string mainPath = dir + "/" + projectName + ".c";
-        std::string headerPath = dir + "/" + projectName + ".h";
-        std::string makePath = dir + "/" + "Makefile";
-        if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tgcc -o a *c") == Err) return Err;
+    } else if (strcmp(projectLanguage, "C") == 0) {
+        strcat(mainPath, ".c");
+        if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tgcc -o a *.c") == Err) return Err;
         if (writeToFile(mainPath,
             "#include <stdio.h>\n"
-            "#include \"" + projectName + ".h\"\n\n"
+            "#include \"" projectName ".h\"\n\n"
             "int main() {\n"
-            "\tprintf(\"Hello, World" + "\\" + "n" + "\");\n\n"
+            "\tprintf(\"Hello, World!\\n\");\n\n"
             "\treturn 0;\n"
             "}"
         ) == Err) return Err;
-
-        std::string upperName = projectName;
-        for (char &c : upperName) {
-            c = std::toupper(static_cast<unsigned char>(c));
-        }
+        toUpperCase(headerPath);
         if (writeToFile(headerPath,
-            "#ifndef " + upperName + "_H\n"
-            "#define " + upperName + "_H\n\n"
+            "#ifndef " headerPath "_H\n"
+            "#define " headerPath "_H\n\n"
             "#endif"
         ) == Err) return Err;
-    } else if(projectLanguage == "Python" || projectLanguage == "Py") {
-        std::string mainPath = dir + "/" + projectName + ".py";
-        if (writeToFile(mainPath,
-            "def main():\n\tprint(\"Hello, World!\")"
-        ) == Err) return Err;
-    } else if(projectLanguage == "Pascal" || projectLanguage == "Pas") {
-        std::string mainPath = dir + "/" + projectName + ".pas";
+    } else if (strcmp(projectLanguage, "Python") == 0 || strcmp(projectLanguage, "Py") == 0) {
+        strcat(mainPath, ".py");
+        if (writeToFile(mainPath, "def main():\n\tprint(\"Hello, World!\")") == Err) return Err;
+    } else if (strcmp(projectLanguage, "Pascal") == 0 || strcmp(projectLanguage, "Pas") == 0) {
+        strcat(mainPath, ".pas");
         if (writeToFile(mainPath,
             "program main;\n\n"
             "begin\n"
             "\tWriteLn('Hello, World!');\n"
             "end."
         ) == Err) return Err;
-    } else if(projectLanguage == "Lua") {
-        std::string mainPath = dir + "/" + projectName + ".lua";
+    } else if (strcmp(projectLanguage, "Lua") == 0) {
+        strcat(mainPath, ".lua");
         if (writeToFile(mainPath,
             "local function main()\n"
             "\tprint(\"Hello, World!\")\n"
             "end\n\n"
             "main()"
         ) == Err) return Err;
-    } else if(projectLanguage == "Javascript" || projectLanguage == "JavaScript") {
-        std::string mainPath = dir + "/" + projectName + ".js";
+    } else if (strcmp(projectLanguage, "Javascript") == 0 || strcmp(projectLanguage, "JavaScript") == 0) {
+        strcat(mainPath, ".js");
         if (writeToFile(mainPath,
             "function main() {\n"
             "\tconsole.log('Hello, World!');\n"
             "}\n\n"
             "main();"
         ) == Err) return Err;
-    } else if(projectLanguage == "Java") {
-        std::string mainPath = dir + "/" + projectName + ".java";
+    } else if (strcmp(projectLanguage, "Java") == 0) {
+        strcat(mainPath, ".java");
         if (writeToFile(mainPath,
-            "public class " + projectName + " {\n"
+            "public class " projectName " {\n"
             "\tpublic static void main(String[] args) {\n"
             "\t\tSystem.out.println(\"Hello, World!\");\n"
             "\t}\n"
             "}"
         ) == Err) return Err;
-    } else if(projectLanguage == "C#" || projectLanguage == "Cs") {
-        std::string mainPath = dir + "/" + projectName + ".cs";
+    } else if (strcmp(projectLanguage, "C#") == 0 || strcmp(projectLanguage, "Cs") == 0) {
+        strcat(mainPath, ".cs");
         if (writeToFile(mainPath,
             "using System;\n\n"
-            "namespace " + projectName + " {\n"
+            "namespace " projectName " {\n"
             "\tclass Program {\n"
             "\t\tstatic void Main(string[] args) {\n"
             "\t\t\tConsole.WriteLine(\"Hello, World!\");\n"
@@ -126,15 +150,15 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "\t}\n"
             "}"
         ) == Err) return Err;
-    } else if(projectLanguage == "Rust" || projectLanguage == "Rs") {
-        std::string mainPath = dir + "/" + projectName + ".rs";
+    } else if (strcmp(projectLanguage, "Rust") == 0 || strcmp(projectLanguage, "Rs") == 0) {
+        strcat(mainPath, ".rs");
         if (writeToFile(mainPath,
             "pub fn main() {\n"
             "\tprintln!(\"Hello, World!\");\n"
             "}"
         ) == Err) return Err;
-    } else if(projectLanguage == "Zig") {
-        std::string mainPath = dir + "/" + projectName + ".zig";
+    } else if (strcmp(projectLanguage, "Zig") == 0) {
+        strcat(mainPath, ".zig");
         if (writeToFile(mainPath,
             "const std = @import(\"std\");\n\n"
             "pub fn main() !void {\n"
@@ -142,23 +166,23 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "\ttry stdout.print(\"Hello, world!\");\n"
             "}"
         ) == Err) return Err;
-    } else if(projectLanguage == "Nim") {
-        std::string mainPath = dir + "/" + projectName + ".nim";
+    } else if (strcmp(projectLanguage, "Nim") == 0) {
+        strcat(mainPath, ".nim");
         if (writeToFile(mainPath,
             "proc main() =\n"
             "\techo \"Hello, world!\"\n\n"
             "when isMainModule:\n"
             "\tmain()"
         ) == Err) return Err;
-    } else if(projectLanguage == "Kotlin" || projectLanguage == "Kot") {
-        std::string mainPath = dir + "/" + projectName + ".kt";
+    } else if (strcmp(projectLanguage, "Kotlin") == 0 || strcmp(projectLanguage, "Kot") == 0) {
+        strcat(mainPath, ".kt");
         if (writeToFile(mainPath,
             "fun main() {\n"
             "\tprintln(\"Hello, world!\")\n"
             "}"
         ) == Err) return Err;
-    }  else if(projectLanguage == "Haskell" || projectLanguage == "Hask") {
-        std::string mainPath = dir + "/" + projectName + ".hs";
+    } else if (strcmp(projectLanguage, "Haskell") == 0 || strcmp(projectLanguage, "Hask") == 0) {
+        strcat(mainPath, ".hs");
         if (writeToFile(mainPath,
             "module Start\n"
             "\t( main\n"
@@ -167,26 +191,8 @@ Result project(const std::string& projectName, const std::string& projectLanguag
             "main = putStrLn \"Hello, World\""
         ) == Err) return Err;
     } else {
-        std::cerr << "Language " << projectLanguage << " not supported" << std::endl;
+        fprintf(stderr, "Language %s not supported\n", projectLanguage);
         return Err;
     }
     return Ok;
-}
-
-int main(int argc, char* argv[]) {
-    if(argc >= 1 && strcmp(argv[1], "-n") == 0) {
-        std::cout << "Enter projects name: ";
-        std::cin >> name;
-    } else {
-        name = "main";
-    }
-
-    std::cout << "Enter projects language (Capital Letter): ";
-    std::cin >> lang;
-
-    system("clear");    
-    if (project(name, lang) != Ok) return 1;
-
-    std::cout << "Project '" << name << "' (" << lang << ") was successfully made" << std::endl;
-    return 0;
 }
