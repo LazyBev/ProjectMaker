@@ -2,7 +2,7 @@
 
 CC = gcc
 CCFLAGS = -Wall -Wextra
-SRC = *.cc
+SRC = *.c
 BUILD = boiler
 
 all:
