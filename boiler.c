@@ -62,46 +62,50 @@ Result project(const char *projectName, const char *projectLanguage) {
         return Err;
     }
 
-    char mainPath[256], headerPath[256], makePath[256];
+    char mainPath[256], headerPath[256], makePath[256], headerGuard[256];
     snprintf(mainPath, sizeof(mainPath), "%s/%s", projectName, projectName);
     snprintf(headerPath, sizeof(headerPath), "%s/%s.h", projectName, projectName);
     snprintf(makePath, sizeof(makePath), "%s/Makefile", projectName);
+    snprintf(headerGuard, sizeof(headerGuard), "%s_%s_H", projectName, projectName);
+    toUpperCase(headerGuard);
 
     if (strcmp(projectLanguage, "C++") == 0 || strcmp(projectLanguage, "Cpp") == 0) {
         strcat(mainPath, ".cc");
         snprintf(headerPath, sizeof(headerPath), "%s/%s.hh", projectName, projectName);
         if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tg++ -o a *.cc") == Err) return Err;
-        if (writeToFile(mainPath,
+        char mainContent[1024];
+        snprintf(mainContent, sizeof(mainContent),
             "#include <iostream>\n"
-            "#include \"" projectName ".hh\"\n\n"
+            "#include \"%s.hh\"\n\n"
             "int main() {\n"
             "\tstd::cout << \"Hello, World!\" << std::endl;\n\n"
             "\treturn 0;\n"
-            "}"
-        ) == Err) return Err;
-        toUpperCase(headerPath);
-        if (writeToFile(headerPath,
-            "#ifndef " headerPath "_HH\n"
-            "#define " headerPath "_HH\n\n"
-            "#endif"
-        ) == Err) return Err;
+            "}", projectName);
+        if (writeToFile(mainPath, mainContent) == Err) return Err;
+        char headerContent[1024];
+        snprintf(headerContent, sizeof(headerContent),
+            "#ifndef %s_HH\n"
+            "#define %s_HH\n\n"
+            "#endif", headerGuard, headerGuard);
+        if (writeToFile(headerPath, headerContent) == Err) return Err;
     } else if (strcmp(projectLanguage, "C") == 0) {
         strcat(mainPath, ".c");
         if (writeToFile(makePath, ".PHONY: all\n\nall:\n\tgcc -o a *.c") == Err) return Err;
-        if (writeToFile(mainPath,
+        char mainContent[1024];
+        snprintf(mainContent, sizeof(mainContent),
             "#include <stdio.h>\n"
-            "#include \"" projectName ".h\"\n\n"
+            "#include \"%s.h\"\n\n"
             "int main() {\n"
             "\tprintf(\"Hello, World!\\n\");\n\n"
             "\treturn 0;\n"
-            "}"
-        ) == Err) return Err;
-        toUpperCase(headerPath);
-        if (writeToFile(headerPath,
-            "#ifndef " headerPath "_H\n"
-            "#define " headerPath "_H\n\n"
-            "#endif"
-        ) == Err) return Err;
+            "}", projectName);
+        if (writeToFile(mainPath, mainContent) == Err) return Err;
+        char headerContent[1024];
+        snprintf(headerContent, sizeof(headerContent),
+            "#ifndef %s_H\n"
+            "#define %s_H\n\n"
+            "#endif", headerGuard, headerGuard);
+        if (writeToFile(headerPath, headerContent) == Err) return Err;
     } else if (strcmp(projectLanguage, "Python") == 0 || strcmp(projectLanguage, "Py") == 0) {
         strcat(mainPath, ".py");
         if (writeToFile(mainPath, "def main():\n\tprint(\"Hello, World!\")") == Err) return Err;
@@ -131,25 +135,27 @@ Result project(const char *projectName, const char *projectLanguage) {
         ) == Err) return Err;
     } else if (strcmp(projectLanguage, "Java") == 0) {
         strcat(mainPath, ".java");
-        if (writeToFile(mainPath,
-            "public class " projectName " {\n"
+        char mainContent[1024];
+        snprintf(mainContent, sizeof(mainContent),
+            "public class %s {\n"
             "\tpublic static void main(String[] args) {\n"
             "\t\tSystem.out.println(\"Hello, World!\");\n"
             "\t}\n"
-            "}"
-        ) == Err) return Err;
+            "}", projectName);
+        if (writeToFile(mainPath, mainContent) == Err) return Err;
     } else if (strcmp(projectLanguage, "C#") == 0 || strcmp(projectLanguage, "Cs") == 0) {
         strcat(mainPath, ".cs");
-        if (writeToFile(mainPath,
+        char mainContent[1024];
+        snprintf(mainContent, sizeof(mainContent),
             "using System;\n\n"
-            "namespace " projectName " {\n"
+            "namespace %s {\n"
             "\tclass Program {\n"
             "\t\tstatic void Main(string[] args) {\n"
             "\t\t\tConsole.WriteLine(\"Hello, World!\");\n"
             "\t\t}\n"
             "\t}\n"
-            "}"
-        ) == Err) return Err;
+            "}", projectName);
+        if (writeToFile(mainPath, mainContent) == Err) return Err;
     } else if (strcmp(projectLanguage, "Rust") == 0 || strcmp(projectLanguage, "Rs") == 0) {
         strcat(mainPath, ".rs");
         if (writeToFile(mainPath,
