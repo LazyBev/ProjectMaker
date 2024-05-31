@@ -5,13 +5,11 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
-// Define enum for Result
 typedef enum {
     Ok,
     Err,
 } Result;
 
-// Function prototypes
 Result writeToFile(const char *path, const char *contents);
 Result project(const char *projectName, const char *projectLanguage);
 void toUpperCase(char *str);
@@ -56,7 +54,6 @@ void toUpperCase(char *str) {
 }
 
 Result project(const char *projectName, const char *projectLanguage) {
-    // Create directory
     if (mkdir(projectName, 0755) == -1) {
         perror("Failed to create directory");
         return Err;
